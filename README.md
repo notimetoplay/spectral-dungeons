@@ -5,4 +5,4 @@ Spectral Dungeons started out as a coffeebreak roguelike for the ZX Spectrum. It
 
 The first two games were made with [Boriel's ZXBasic compiler](http://www.boriel.com/wiki/en/index.php/ZXBasic) and require a 48K Spectrum to run -- or more likely an emulator. Tomb of the Snake should run out of the box on a Mac or any typical Linux distro.
 
-All games are available at [No Time To Play](http://notimetoplay.org/our-games/) and [on Itch.io](http://claudeb.itch.io/).
+All games are available at [No Time To Play](http://notimetoplay.org/our-games/) and [on Itch.io](http://claudeb.itch.io/). Assets with sample files can be found on [Open Game Art](http://opengameart.org/content/monochrome-8x8-roguelike-tiles).
