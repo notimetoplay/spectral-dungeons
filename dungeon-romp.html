@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Dungeon Romp</title>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="dungeon-romp.js"></script>
+  <script type="text/javascript">
+	window.onload = function () {
+		var game = new DungeonRomp.Game(
+			document.getElementById("gamescreen"));
+	};
+  </script>
+ </head>
+
+ <body>
+  <h1>Dungeon Romp</h1>
+
+  <div style="Display: table-cell;">
+   <div id="gamescreen" style="Font-family: monospace; Background-color: black; Color: #cccccc;"></div>
+  </div>
+
+ </body>
+</html>
