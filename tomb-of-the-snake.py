@@ -1227,10 +1227,25 @@ class GameLog:
 		self.messages = []
 	
 	def say(self, message):
+		message = message[0].capitalize() + message[1:]
 		self.messages.append(message)
 		while len(self.messages) > 100:
 			del self.messages[0]
-			
+
+	def call_attack(self, attacker, defender, damage):
+		name1 = attacker.the_name()
+		name2 = defender.the_name()
+		if damage <= 0:
+			self.say("%s pokes %s harmlessly." % (name1, name2))
+		elif damage > defender.life():
+			msg = "%s strikes %s for %d damage, killing %s!"
+			msg  = msg % (name1, name2, damage, defender.pronoun)
+			self.say(msg)
+		else:
+			msg = "%s strikes %s for %d damage."
+			msg  = msg % (name1, name2, damage)
+			self.say(msg)
+
 	def __call__(self, message):
 		self.say(message)
 
@@ -1241,6 +1256,8 @@ class GameWorld:
 
 		self.mcguffin = Item(items["idol"])
 		self.player = Creature(creatures["human"])
+		self.player.pronoun = "them"
+		self.player.proper_name = True
 		self.level0 = DungeonLevel(0, levels[0])
 		self.level0.populate()
 		
@@ -1258,12 +1275,8 @@ class GameWorld:
 					drop = Item(drop)
 					drop.move_to(i.x, i.y, i.level)
 				i.move_to(-1, -1, None)
-				log(i.name + " is dead!")
 			elif i.action_points <= 0:
 				i.action_points += i.speed * i.dice_size
-			#elif i.distance_to(self.player) == 1:
-			#	if not self.player.is_dead():
-			#		i.attack(self.player)
 			elif i.mind == "animal":
 				self.animal_ai.take_turn(i)
 			elif i.mind == "undead":
@@ -1357,6 +1370,8 @@ class Thing:
 		self.y = -1
 		
 		self.name = "thing"
+		self.pronoun = "it"
+		self.proper_name = False
 		self.special = None
 	
 	def move_to(self, x, y, parent = None):
@@ -1376,8 +1391,20 @@ class Thing:
 		else:
 			raise ValueError("Can't move outside the level map.")
 
+	def the_name(self):
+		if self.proper_name:
+			return self.name
+		else:
+			return "the " + self.name
+	
+	def a_name(self):
+		if self.name[0] in ('a', 'e', 'i', 'o', 'u'):
+			return "an " + self.name
+		else:
+			return "a " + self.name
+
 	def __str__(self):
-		return self.name
+		return self.a_name()
 
 class Item(Thing):
 	def __init__(self, template):
@@ -1514,7 +1541,7 @@ class Creature(Thing):
 	
 	def attack(self, creature):
 		if self.distance_to(creature) > 1:
-			self.log(creature.name +
+			self.log(creature.the_name() +
 				" is too far away for melee.")
 			return False
 		
@@ -1537,14 +1564,10 @@ class Creature(Thing):
 			damage = creature.apply_armor(damage)
 			if damage > 0:
 				creature.wounds += damage
-				self.log("%s strikes %s for %d damage!" %
-					(self.name, creature.name, damage))
-			else:
-				self.log("%s pokes %s harmlessly." %
-					(self.name, creature.name))
+			self.log.call_attack(self, creature, damage)
 		else:
 			self.log("%s misses %s." %
-				(self.name, creature.name))
+				(self.the_name(), creature.the_name()))
 
 		if self.weapon != None:
 			self.action_points -= 4 + self.weapon.weight
@@ -1585,14 +1608,14 @@ class Creature(Thing):
 			if damage > 0:
 				creature.wounds += damage
 				self.log("%s shoots %s for %d damage!" %
-					(self.name, creature.name, damage))
+					(self.the_name(), creature.the_name(), damage))
 			else:
 				self.log("%s hits %s harmlessly." %
-					(self.name, creature.name))
+					(self.the_name(), creature.the_name()))
 		else:
 			self.ammo.move_to(x, y, self.level)
 			self.log("%s's shot misses %s." %
-				(self.name, creature.name))
+				(self.the_name(), creature.the_name()))
 		
 		for item in self.content.copy():
 			if item.name == self.ammo.name:
@@ -1633,7 +1656,7 @@ class Creature(Thing):
 				damage, self.effects[kind]["damage"])
 		else:
 			self.effects[kind] = {"turns": turns, "damage": damage}
-		self.log("%s is %s!" % (self.name, fxdescs[kind]))
+		self.log("%s is %s!" % (self.the_name(), fxdescs[kind]))
 	
 	def is_dead(self):
 		return self.wounds >= self.dice_size * self.stamina
