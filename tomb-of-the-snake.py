@@ -952,7 +952,7 @@ class GameScreen:
 			draw_help_bar(self.stdscr, "? @ [I]nventory [M]enu")
 		else:
 			draw_help_bar(self.stdscr,
-				"? @ [I]nventory [G]et [D]rop [Eat] "
+				"? @ [I]nventory [G]et [D]rop [E]at "
 				"[W]ield [F]ire e[X]amine [T]unnel [M]enu")
 		
 		self.stdscr.refresh()
